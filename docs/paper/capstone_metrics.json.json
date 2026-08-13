@@ -1,0 +1,129 @@
+{
+  "capstone": {
+    "lane": "Refresh / Content Opportunity Scoring",
+    "dataset": "FlyRank ML Internship starter dataset (content_refresh_anonymized.csv)",
+    "n_rows": 30000,
+    "n_clients": 32,
+    "target": {
+      "name": "is_declining",
+      "definition": "trend_direction == 'down'",
+      "source": "observed 30d-over-30d trend, computed upstream, not a hand-defined rule",
+      "base_rate_full_dataset": 0.542
+    }
+  },
+
+  "data_contract": {
+    "avg_position_zero_no_data_rows": 1205,
+    "missing_scroll_rate_rows": 125,
+    "missing_word_count_rows": 7699,
+    "leakage_excluded_columns": ["impressions_last_30d", "impressions_prev_30d"],
+    "leakage_check_impressions_last_30d": {
+      "honest_roc_auc": 0.6707,
+      "leaky_roc_auc": 0.8245,
+      "auc_jump": 0.1539
+    },
+    "leakage_positive_control_trend_pct": {
+      "honest_roc_auc": 0.5783,
+      "leaky_roc_auc": 0.9991,
+      "auc_jump": 0.4208,
+      "note": "trend_pct is the value the label is computed from directly; used to confirm the leakage-detection harness itself works"
+    }
+  },
+
+  "baseline_rule": {
+    "description": "stale (days_since_last_update >= 180) AND visible (impressions_90d >= 500) AND recoverable position (10 < avg_position <= 50)",
+    "review_flagged_count_full_dataset": 14,
+    "total_dataset_rows": 30000,
+    "precision_at_k_full_dataset": {
+      "20": 0.700,
+      "50": 0.480,
+      "100": 0.420
+    },
+    "precision_at_k_held_out_test_split": {
+      "20": 0.45,
+      "50": 0.62,
+      "100": 0.61
+    },
+    "note": "Two different evaluation sets: full-dataset numbers are from w04_baseline_score.ipynb; held-out test-split numbers are the same frozen rule scores re-evaluated in w05_model.ipynb against only the 7 held-out clients, for a fair comparison against the trained models."
+  },
+
+  "model_comparison": {
+    "split_design": "GroupShuffleSplit by client_id, test_size=0.2, random_state=42",
+    "train_rows": 23837,
+    "test_rows": 6163,
+    "train_clients": 25,
+    "test_clients": 7,
+    "base_rate_test_split": 0.511,
+    "precision_at_k": {
+      "20": {"base_rate": 0.511, "baseline_rule": 0.45, "logistic_regression": 0.75, "random_forest": 0.40},
+      "50": {"base_rate": 0.511, "baseline_rule": 0.62, "logistic_regression": 0.74, "random_forest": 0.48},
+      "100": {"base_rate": 0.511, "baseline_rule": 0.61, "logistic_regression": 0.73, "random_forest": 0.53}
+    },
+    "shipped_model": "logistic_regression",
+    "shipped_model_reason": "Beats base rate and rule baseline at every K on the held-out client-grouped split; Random Forest underperforms base rate at K=20/K=50 and loses to the rule at every K.",
+    "logistic_regression_confusion_matrix_at_0.5_threshold": {
+      "true_negative": 1150,
+      "false_positive": 1864,
+      "false_negative": 880,
+      "true_positive": 2269,
+      "note": "Precision@K reflects ranking strength at the top of the list; a plain 0.5 threshold is not how the system is actually used downstream."
+    },
+    "top_features_random_forest": [
+      {"feature": "days_with_impressions", "importance": 0.2359},
+      {"feature": "impressions_90d", "importance": 0.1818},
+      {"feature": "content_age_days", "importance": 0.1505},
+      {"feature": "has_position_data", "importance": 0.0729},
+      {"feature": "avg_position_filled", "importance": 0.0689}
+    ]
+  },
+
+  "validation_audit": {
+    "repeats": 8,
+    "test_size": 0.2,
+    "metric": "precision_at_50",
+    "random_row_split": {"mean": 0.828, "sd": 0.024},
+    "client_grouped_split": {"mean": 0.735, "sd": 0.060},
+    "memorization_gap": 0.093
+  },
+
+  "action_playbook": {
+    "visibility_floor_impressions_90d": 500,
+    "n_eligible_for_queue": 16726,
+    "eligible_population_base_rate": 0.596,
+    "archetype_summary": {
+      "Fix CTR":  {"n": 5893, "observed_decline_rate": 0.665, "status": "elevated vs base rate"},
+      "Support":  {"n": 1371, "observed_decline_rate": 0.573, "status": "at/below base rate"},
+      "Refresh":  {"n": 2445, "observed_decline_rate": 0.562, "status": "at/below base rate"},
+      "Monitor":  {"n": 7017, "observed_decline_rate": 0.554, "status": "reference / no-flag bucket"}
+    },
+    "precision_at_k_playbook_model": {
+      "20": 0.750,
+      "50": 0.740,
+      "100": 0.730
+    },
+    "accuracy_by_traffic_tier": {
+      "low": {"mean_accuracy": 0.554, "n": 1559},
+      "mid": {"mean_accuracy": 0.590, "n": 1525},
+      "high": {"mean_accuracy": 0.587, "n": 1538},
+      "top": {"mean_accuracy": 0.488, "n": 1541}
+    }
+  },
+
+  "limitations": [
+    "Directional and observational only; no causal claim that refreshing a page causes recovery.",
+    "Decision-support for a human reviewer, not an automated verdict.",
+    "Scoped to the 30,000-row starter dataset; not verified against the larger warehouse release.",
+    "Precision@K varies across client-grouped splits (sd ~0.06 at precision@50).",
+    "No claim is made about Google's ranking algorithm."
+  ],
+
+  "source_notebooks": [
+    "w01_research_question.ipynb",
+    "w02_ml_task_framing.ipynb",
+    "w03_data_contract.ipynb",
+    "w04_baseline_score.ipynb",
+    "w05_model.ipynb",
+    "w06_validation_audit.ipynb",
+    "w07_action_playbook.ipynb"
+  ]
+}

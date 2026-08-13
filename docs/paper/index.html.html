@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Which Pages Should a Content Team Review First? — Refresh Opportunity Scoring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F2F4F2;
+    --panel: #FFFFFF;
+    --ink: #16211D;
+    --ink-soft: #4A564F;
+    --line: #D9DED8;
+    --teal: #0C6B66;
+    --teal-soft: #E4EFED;
+    --amber: #C97A2C;
+    --amber-soft: #FBEEE0;
+    --red-flag: #A83E3E;
+    --mono: 'IBM Plex Mono', monospace;
+    --serif: 'Fraunces', serif;
+    --sans: 'Inter', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--teal);}
+  .wrap{max-width:920px;margin:0 auto;padding:0 28px;}
+
+  /* ===== HERO ===== */
+  .hero{
+    padding:96px 0 72px;
+    border-bottom:1px solid var(--line);
+    position:relative;
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--teal);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:26px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:7px;height:7px;
+    background:var(--teal);
+    border-radius:50%;
+    display:inline-block;
+  }
+  h1{
+    font-family:var(--serif);
+    font-optical-sizing:auto;
+    font-weight:600;
+    font-size:clamp(34px, 5vw, 54px);
+    line-height:1.08;
+    letter-spacing:-0.01em;
+    margin:0 0 28px;
+    max-width:15ch;
+  }
+  .lede{
+    font-size:18px;
+    color:var(--ink-soft);
+    max-width:62ch;
+    margin:0 0 40px;
+  }
+  .stat-row{
+    display:flex;
+    gap:0;
+    border:1px solid var(--line);
+    background:var(--panel);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .stat{
+    flex:1;
+    padding:20px 22px;
+    border-right:1px solid var(--line);
+  }
+  .stat:last-child{border-right:none;}
+  .stat .num{
+    font-family:var(--mono);
+    font-size:26px;
+    font-weight:600;
+    color:var(--ink);
+    display:block;
+  }
+  .stat .num.up{color:var(--teal);}
+  .stat .label{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:4px;
+    display:block;
+  }
+
+  /* ===== SECTIONS ===== */
+  section{
+    padding:56px 0;
+    border-bottom:1px solid var(--line);
+  }
+  section.tight{padding:44px 0;}
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    margin-bottom:24px;
+  }
+  .index{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--ink-soft);
+    min-width:24px;
+  }
+  h2{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:26px;
+    margin:0;
+    letter-spacing:-0.005em;
+  }
+  h3{
+    font-family:var(--sans);
+    font-weight:700;
+    font-size:15px;
+    margin:28px 0 10px;
+    color:var(--ink);
+  }
+  p{margin:0 0 16px; max-width:70ch;}
+  ul, ol{margin:0 0 16px; padding-left:22px; max-width:68ch;}
+  li{margin-bottom:8px;}
+  strong{font-weight:600;}
+  code{
+    font-family:var(--mono);
+    background:var(--teal-soft);
+    color:var(--teal);
+    padding:1px 5px;
+    border-radius:3px;
+    font-size:.9em;
+  }
+
+  /* ===== CALLOUT BOXES ===== */
+  .callout{
+    border-left:3px solid var(--teal);
+    background:var(--teal-soft);
+    padding:16px 20px;
+    margin:20px 0;
+    border-radius:0 3px 3px 0;
+  }
+  .callout p{margin:0; max-width:none;}
+  .callout.warn{
+    border-left-color:var(--amber);
+    background:var(--amber-soft);
+  }
+  .callout .tag{
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--amber);
+    display:block;
+    margin-bottom:6px;
+  }
+  .callout.warn .tag{color:var(--amber);}
+
+  /* ===== TABLE ===== */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:20px 0;
+    font-family:var(--mono);
+    font-size:13.5px;
+  }
+  caption{
+    text-align:left;
+    font-family:var(--sans);
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+    caption-side:top;
+  }
+  th, td{
+    text-align:left;
+    padding:10px 14px;
+    border-bottom:1px solid var(--line);
+  }
+  th{
+    font-weight:600;
+    color:var(--ink-soft);
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    border-bottom:2px solid var(--ink);
+  }
+  tr.highlight td{
+    background:var(--teal-soft);
+    font-weight:600;
+    color:var(--teal);
+  }
+  tr td:first-child, th:first-child{padding-left:0;}
+  .beat{color:var(--teal);}
+  .lose{color:var(--red-flag);}
+
+  /* ===== CHART ===== */
+  .chart-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:28px 28px 20px;
+    margin:22px 0;
+  }
+  .chart-title{
+    font-family:var(--sans);
+    font-weight:700;
+    font-size:14px;
+    margin-bottom:2px;
+  }
+  .chart-sub{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-bottom:18px;
+  }
+  .bar-label{font-family:var(--sans); font-size:12.5px; fill:var(--ink);}
+  .bar-value{font-family:var(--mono); font-size:12px; fill:var(--ink-soft);}
+  .base-label{font-family:var(--mono); font-size:11px; fill:var(--amber);}
+
+  /* ===== LIST/PLAYBOOK ===== */
+  .rec{
+    display:flex;
+    gap:16px;
+    padding:16px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .rec:last-child{border-bottom:none;}
+  .rec-num{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--teal);
+    min-width:22px;
+    padding-top:2px;
+  }
+  .rec p{margin:0;}
+  .rec strong{color:var(--ink);}
+
+  /* ===== ARCHETYPE CHIPS ===== */
+  .chip-row{display:flex; flex-wrap:wrap; gap:8px; margin:16px 0;}
+  .chip{
+    font-family:var(--mono);
+    font-size:12px;
+    padding:6px 10px;
+    border:1px solid var(--line);
+    border-radius:3px;
+    background:var(--panel);
+  }
+
+  /* ===== FOOTER ===== */
+  footer{
+    padding:48px 0 80px;
+  }
+  .credit{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:14px;
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+  .credit a{color:var(--teal); text-decoration:none;}
+  .credit a:hover{text-decoration:underline;}
+
+  .repro-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px 24px;
+    margin:18px 0;
+  }
+  .repro-item{
+    font-family:var(--mono);
+    font-size:12.5px;
+    padding:10px 12px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:3px;
+    color:var(--ink-soft);
+  }
+  .repro-item b{color:var(--ink); font-weight:600;}
+
+  @media (max-width:640px){
+    .hero{padding:64px 0 48px;}
+    .stat-row{flex-direction:column;}
+    .stat{border-right:none; border-bottom:1px solid var(--line);}
+    .stat:last-child{border-bottom:none;}
+    .repro-grid{grid-template-columns:1fr;}
+    table{font-size:12px;}
+    th, td{padding:8px 8px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="eyebrow">Refresh / Content Opportunity Scoring · FlyRank Internship Capstone</div>
+    <h1>Which pages should a content team review first?</h1>
+    <p class="lede">A ranked, reason-coded scoring system that tells an editorial team where to spend limited review time — validated against a hand-written baseline on real, client-held-out data.</p>
+    <div class="stat-row">
+      <div class="stat">
+        <span class="num up">0.74</span>
+        <span class="label">Precision@50, Logistic Regression</span>
+      </div>
+      <div class="stat">
+        <span class="num">0.51</span>
+        <span class="label">Base rate (random ordering)</span>
+      </div>
+      <div class="stat">
+        <span class="num">30,000</span>
+        <span class="label">Pages · 32 clients</span>
+      </div>
+      <div class="stat">
+        <span class="num">7</span>
+        <span class="label">Held-out clients, never trained on</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABSTRACT -->
+  <section class="tight">
+    <div class="section-head"><span class="index">§0</span><h2>Abstract</h2></div>
+    <p>Content teams managing large page catalogs cannot manually review every page for staleness or decline, so they need a way to prioritize. This project asks: <strong>which pages should a content team review first, given limited reviewer time?</strong> A hand-written scoring rule (staleness × visibility × recoverable position) was built first, then compared against trained classifiers on the same client-grouped, leakage-checked split. Logistic Regression was the clear, validated winner — beating both the observed base rate and the rule baseline at every evaluated cutoff — while Random Forest underperformed the base rate at low K and was rejected despite its typical reputation as the stronger model. The result is a ranked, reason-coded action queue that gives a content team a defensible starting point for review, not a verdict on any single page.</p>
+  </section>
+
+  <!-- INTRO -->
+  <section>
+    <div class="section-head"><span class="index">§1</span><h2>Introduction</h2></div>
+    <p>Editorial and content operations teams often manage far more pages than they can realistically review in a given week or month. The decision this project supports is narrow and concrete: out of thousands of pages, which ones should a human reviewer open first? The people who act on this are content strategists or editors deciding whether to update, expand, fix metadata, or leave a page alone.</p>
+    <div class="callout">
+      <span class="tag">Why ranking, not a cutoff</span>
+      <p>The cost of getting this wrong is asymmetric. Flagging a healthy page wastes bounded reviewer time. Missing a genuinely declining page is worse — it's invisible, and the page keeps losing visibility unattended, compounding over time. This is why the system outputs a ranked list, not a hard yes/no cutoff: it lets a human apply judgment rather than treating the model as automatic.</p>
+    </div>
+  </section>
+
+  <!-- DATA -->
+  <section>
+    <div class="section-head"><span class="index">§2</span><h2>Data</h2></div>
+    <p>This analysis uses the FlyRank ML Internship starter dataset: <strong>30,000 pseudonymized content items across 32 clients</strong>, one row per content item, with <code>client_id</code> used only for grouping — never as a feature or in printed output. All metrics are trailing windows "as of" an implicit snapshot; there are no absolute calendar dates in this slice.</p>
+    <p>Two columns required deliberate exclusion to avoid leakage: <code>impressions_last_30d</code> and <code>impressions_prev_30d</code>, which can directly derive the decline label. Their exclusion was verified empirically — a model given these columns back showed an artificial jump in accuracy (ROC-AUC 0.671 → 0.825, a +0.15 jump), confirming they leak the outcome being predicted. A separate, stricter check reintroduced <code>trend_pct</code> — the value the label is computed from directly — and produced an even larger jump (0.578 → 0.999), confirming the leakage-detection process itself is sound.</p>
+    <p>Missingness in the data (<code>scroll_rate</code>, <code>word_count</code>) follows <code>content_type</code> rather than being random, so missing values were flagged with <code>has_*</code> indicator columns and imputed from training-set medians, rather than blindly filled with zero.</p>
+    <div class="callout warn">
+      <span class="tag">Scope limit</span>
+      <p>This is a 30,000-row convenience sample, not the full multi-million-row warehouse. Findings here are scoped to this slice and are not assumed to transfer to a larger release without re-validation.</p>
+    </div>
+  </section>
+
+  <!-- METHODOLOGY -->
+  <section>
+    <div class="section-head"><span class="index">§3</span><h2>Methodology</h2></div>
+
+    <h3>Target</h3>
+    <p><code>is_declining</code>, defined as <code>trend_direction == "down"</code> — an observed 30-day-over-30-day trend computed upstream in the data, not a rule invented for this project. 54.2% of the starter dataset is currently declining by this definition.</p>
+
+    <h3>Features</h3>
+    <p>Ten page-level signals available before the decision moment — <code>impressions_90d</code>, <code>ctr</code>, <code>avg_position</code>, <code>engagement_rate</code>, <code>scroll_rate</code>, <code>days_since_last_update</code>, <code>content_age_days</code>, <code>word_count</code>, <code>freshness_tier</code>, <code>days_with_impressions</code> — plus missingness flags. <code>avg_position == 0</code> was treated as "no position data," not rank zero (1,205 rows).</p>
+
+    <h3>Baseline</h3>
+    <p>A plain-language, non-fitted rule — a page is worth reviewing if it's stale (≥180 days since update), still visible (≥500 impressions in 90 days), and sits in a recoverable position band (10th–50th average position). This rule flagged only 14 of 30,000 pages for review, reflecting how restrictive a single-threshold rule is in practice.</p>
+
+    <h3>Validation design</h3>
+    <p>An 80/20 <code>GroupShuffleSplit</code> grouped by <code>client_id</code>, so no client's pages appear in both train and test. This split was frozen and reused identically across the baseline, both trained models, and all downstream audit and playbook work (see §2 for the leakage checks run against this feature set).</p>
+
+    <h3>Success metric</h3>
+    <p>Precision@K (K = 20, 50, 100), always reported alongside the base rate, since precision@K is meaningless without knowing what a random ordering would achieve.</p>
+  </section>
+
+  <!-- RESULTS -->
+  <section>
+    <div class="section-head"><span class="index">§4</span><h2>Results</h2></div>
+
+    <table>
+      <caption>Precision@K, all four columns evaluated on the identical held-out, client-grouped test split (6,163 rows across 7 never-trained-on clients)</caption>
+      <thead>
+        <tr><th>K</th><th>Base rate</th><th>Rule baseline</th><th>Logistic Regression</th><th>Random Forest</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>20</td><td>0.511</td><td>0.45</td><td class="beat">0.75</td><td class="lose">0.40</td></tr>
+        <tr class="highlight"><td>50</td><td>0.511</td><td>0.62</td><td>0.74</td><td class="lose" style="color:var(--red-flag); font-weight:400;">0.48</td></tr>
+        <tr><td>100</td><td>0.511</td><td>0.61</td><td class="beat">0.73</td><td class="beat">0.53</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <span class="tag">Reading this table</span>
+      <p>These rule-baseline numbers differ from the baseline notebook's own stand-alone evaluation (0.70/0.48/0.42), which scored the rule against the <em>full</em> 30,000-row dataset. The rule itself is unchanged — evaluating it only against the harder, held-out client subset here is the fairer, apples-to-apples comparison against the trained models, and is the version treated as authoritative throughout this paper.</p>
+    </div>
+
+    <p>Logistic Regression beat both the base rate and the rule baseline at every evaluated K. Random Forest underperformed the base rate at K=20 and K=50, and lost to the simple rule at every K — a specific, documented negative result. Per the project's own standard (add complexity only when the comparison earns it), Random Forest was not shipped; Logistic Regression is the model the validation audit and action playbook build on.</p>
+
+    <div class="callout warn">
+      <span class="tag">Limitation — thresholded classification vs. ranking</span>
+      <p>These precision@K numbers describe Logistic Regression's strength at the <em>top</em> of its ranked list. At a default 0.5 probability threshold, its confusion matrix on the test split was TN=1,150, FP=1,864, FN=880, TP=2,269 — meaning a majority of its "declining" flags at that threshold are false positives. This doesn't contradict the precision@K results; it's a reminder that the model's real value is in ordering pages for review, not a blanket yes/no call at an arbitrary cutoff. The final playbook uses the ranked score directly, never a 0.5 cutoff.</p>
+    </div>
+
+    <h3>Validation gap: random split vs. honest split</h3>
+    <p>A random (non-grouped) split overstated performance relative to the honest, client-grouped split — mean precision@50 of <strong>0.828</strong> vs. <strong>0.735</strong> across 8 repeated splits, a measurable ~0.09 gap attributable to within-client memorization. This is exactly why the grouped split is the correct design for this question.</p>
+
+    <h3>Error patterns</h3>
+    <p>The model's mistakes cluster around three recognizable cases, drawn directly from its printed false-positive and false-negative samples:</p>
+    <ol>
+      <li><strong>High-impression, recently updated pages still flagged.</strong> A page with 2,426 impressions and only 13 days since its last update was still flagged as declining — staleness alone doesn't guarantee decline.</li>
+      <li><strong>Very low-impression pages that are missed.</strong> Several false negatives had under 300 impressions with zero clicks — low visibility likely suppressed the model's confidence even though the page was genuinely trending down.</li>
+      <li><strong>Recently updated pages that decline anyway.</strong> The model reads "recent update" as reassuring, but has no way to know whether that update was actually effective.</li>
+    </ol>
+
+    <h3>Archetype scoring — decline rate vs. base rate</h3>
+    <div class="chart-card">
+      <div class="chart-title">Observed decline rate by archetype</div>
+      <div class="chart-sub">Logistic Regression scoring · eligible population base rate = 0.596</div>
+      <svg viewBox="0 0 760 260" width="100%" height="auto" role="img" aria-label="Bar chart of observed decline rate by content archetype, compared to base rate of 0.596">
+        <!-- base rate line: axis at y=210 (value 0), scale 240px/unit -> y = 210 - value*240 -->
+        <line x1="60" y1="67.0" x2="740" y2="67.0" stroke="#C97A2C" stroke-width="1.5" stroke-dasharray="4,4"/>
+        <text x="742" y="71" class="base-label">0.596 base rate</text>
+
+        <!-- axis -->
+        <line x1="60" y1="210" x2="740" y2="210" stroke="#D9DED8" stroke-width="1"/>
+
+        <!-- Fix CTR: 0.665, n=5893 -->
+        <rect x="100" y="50.4" width="90" height="159.6" fill="#0C6B66" rx="2"/>
+        <text x="145" y="230" text-anchor="middle" class="bar-label">Fix CTR</text>
+        <text x="145" y="42" text-anchor="middle" class="bar-value">0.665</text>
+        <text x="145" y="246" text-anchor="middle" class="bar-value">n=5,893</text>
+
+        <!-- Support: 0.573, n=1371 -->
+        <rect x="270" y="72.5" width="90" height="137.5" fill="#5A8F8C" rx="2"/>
+        <text x="315" y="230" text-anchor="middle" class="bar-label">Support</text>
+        <text x="315" y="64" text-anchor="middle" class="bar-value">0.573</text>
+        <text x="315" y="246" text-anchor="middle" class="bar-value">n=1,371</text>
+
+        <!-- Refresh: 0.562, n=2445 -->
+        <rect x="440" y="75.1" width="90" height="134.9" fill="#5A8F8C" rx="2"/>
+        <text x="485" y="230" text-anchor="middle" class="bar-label">Refresh</text>
+        <text x="485" y="66.9" text-anchor="middle" class="bar-value">0.562</text>
+        <text x="485" y="246" text-anchor="middle" class="bar-value">n=2,445</text>
+
+        <!-- Monitor: 0.554, n=7017 -->
+        <rect x="610" y="77.0" width="90" height="133.0" fill="#AEB8AC" rx="2"/>
+        <text x="655" y="230" text-anchor="middle" class="bar-label">Monitor</text>
+        <text x="655" y="68.8" text-anchor="middle" class="bar-value">0.554</text>
+        <text x="655" y="246" text-anchor="middle" class="bar-value">n=7,017</text>
+      </svg>
+    </div>
+    <p>Only <strong>Fix CTR</strong> — visible pages ranked in the top 20 whose click-through rate sits below the position band's median — shows a decline rate clearly elevated above the eligible-population base rate (0.665 vs. 0.596). Refresh and Support sit close to or at the base rate, a limitation named directly rather than smoothed over: the archetype labels describe distinct editorial actions, but not all of them currently carry equally strong predictive signal.</p>
+
+    <h3>Accuracy by traffic tier</h3>
+    <p>Performance was uneven across visibility tiers, ranging from roughly <strong>0.49</strong> (top tier) to <strong>0.59</strong> (mid tier) accuracy — the model is measurably weakest exactly where a wrong call is most costly, and this is carried forward as a named limitation rather than averaged away.</p>
+  </section>
+
+  <!-- LIMITATIONS -->
+  <section>
+    <div class="section-head"><span class="index">§5</span><h2>Limitations &amp; honest framing</h2></div>
+    <ul>
+      <li>All findings here are <strong>observed and directional</strong>, not causal. The data shows association between signals and decline — it does not show that refreshing a page <em>causes</em> recovery. That would require a controlled experiment this dataset cannot support.</li>
+      <li>This is decision-support for a human reviewer, not an automated verdict. No claim is made that the model is "always right."</li>
+      <li>The dataset is a 30,000-row starter slice from 32 clients; results should not be assumed to transfer unchecked to a larger release or different data.</li>
+      <li>Precision@K varies meaningfully across different client-grouped splits (std. deviation roughly 0.06 at precision@50 across repeated splits) — a single reported number understates that variability.</li>
+      <li>Nothing in this analysis makes any claim about Google's ranking algorithm.</li>
+    </ul>
+  </section>
+
+  <!-- RECOMMENDATIONS -->
+  <section>
+    <div class="section-head"><span class="index">§6</span><h2>Ranked recommendations</h2></div>
+
+    <div class="rec">
+      <div class="rec-num">01</div>
+      <p><strong>Prioritize the Logistic Regression–ranked queue over the hand-written rule</strong> for weekly review — it delivers meaningfully higher, validated precision (0.74 vs. 0.62 at K=50 on the held-out split) without added model complexity cost.</p>
+    </div>
+    <div class="rec">
+      <div class="rec-num">02</div>
+      <p><strong>Route pages by archetype, not a single "refresh" bucket.</strong> Fix CTR, Refresh, and Support imply different editorial actions — but only Fix CTR currently shows a decline rate clearly above the base rate, so weight it accordingly.</p>
+    </div>
+    <div class="rec">
+      <div class="rec-num">03</div>
+      <p><strong>Treat the top of the queue as the trustworthy core.</strong> Precision degrades past the top of the ranking; use the highest-ranked items with the most confidence and treat lower-ranked ones as directional.</p>
+    </div>
+    <div class="rec">
+      <div class="rec-num">04</div>
+      <p><strong>Do not automate content edits, deletions, or client-facing forecasts</strong> from this system — it should only ever narrow a human's queue.</p>
+    </div>
+    <div class="rec">
+      <div class="rec-num">05</div>
+      <p><strong>Set monitoring triggers:</strong> re-validate if a fresh sample's precision@50 drops more than one standard deviation below the historical grouped-split mean, if the base decline rate shifts more than 10 points, or at minimum quarterly.</p>
+    </div>
+  </section>
+
+  <!-- REPRODUCIBILITY -->
+  <section>
+    <div class="section-head"><span class="index">§7</span><h2>Reproducibility</h2></div>
+    <p>All notebooks are available in this repository under <code>work/notebooks/</code>:</p>
+    <div class="repro-grid">
+      <div class="repro-item"><b>w01</b> — research question &amp; lane</div>
+      <div class="repro-item"><b>w02</b> — ML task framing, target, metric</div>
+      <div class="repro-item"><b>w03</b> — data contract, leakage checks</div>
+      <div class="repro-item"><b>w04</b> — baseline rule &amp; evaluation</div>
+      <div class="repro-item"><b>w05</b> — model training &amp; comparison</div>
+      <div class="repro-item"><b>w06</b> — validation &amp; audit</div>
+      <div class="repro-item"><b>w07</b> — final action playbook</div>
+    </div>
+    <p>Outputs referenced above (<code>content_action_queue.csv</code>, <code>playbook_metrics.json</code>, <code>model_vs_baseline.csv</code>, <code>split_before_after.csv</code>) are written to <code>work/outputs/</code> by these notebooks.</p>
+  </section>
+
+  <footer>
+    <div class="credit">
+      <span>Built on the FlyRank ML Internship dataset.</span>
+      <a href="https://flyrank.ai" target="_blank" rel="noopener">flyrank.ai →</a>
+    </div>
+  </footer>
+
+</div>
+
+</body>
+</html>
